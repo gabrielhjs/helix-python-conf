@@ -15,6 +15,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Setup local environment
+        run: |
+          python -m pip install -U pip poetry
+          poetry --version
+          poetry check --no-interaction
+          poetry config virtualenvs.in-project true
+          poetry config virtualenvs.create true --local
       - id: cache-dependencies
         name: Cache dependencies
         uses: actions/cache@v4
@@ -25,18 +32,15 @@ jobs:
       - name: Install dependencies
         if: steps.cache-dependencies.cache-hit != 'true'
         run: |
-          python -m pip install -U pip poetry
-          poetry --version
-          poetry check --no-interaction
-          poetry config virtualenvs.in-project true
           poetry install --no-interaction
       - name: Pre Commit check
         run: |
-          pre-commit run --all-files
+          poetry run pre-commit run --all-files
       - uses: jakebailey/pyright-action@v2
         name: Pyright check
         with:
           project: pyproject.toml
+          venv-path: ${{ github.workspace }}/.venv
       - name: Run tests
         run: |
           poetry run pytest -v
