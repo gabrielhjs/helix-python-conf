@@ -2,21 +2,20 @@ name: push ci
 on: [push]
 jobs:
   pyright:
-    name: pyright check
+    name: pyright lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: jakebailey/pyright-action@v2
         with:
           working-directory: helix_python_conf
           project: pyproject.toml
   ruff:
-    name: ruff check
+    name: ruff lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: chartboost/ruff-action@v1
         with:
           src: helix_python_conf
-          args: 'format --check'
-    
+   
