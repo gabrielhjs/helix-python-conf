@@ -1,18 +1,8 @@
 name: CI
 on: [push]
 jobs:
-  pre-commit-check:
-    name: Pre-Commit Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - uses: pre-commit/action@v3.0.1
   ci:
     name: CI
-    needs: pre-commit-check
     strategy:
       fail-fast: false
       matrix:
@@ -40,13 +30,13 @@ jobs:
           poetry check --no-interaction
           poetry config virtualenvs.in-project true
           poetry install --no-interaction
-      - name: Run tests
-        run: |
-          poetry run pytest -v
       - uses: jakebailey/pyright-action@v2
+        name: Pyright check
         with:
           project: pyproject.toml
           venv-path: .venv
-      - uses: chartboost/ruff-action@v1
-        with:
-          src: src
+      - uses: pre-commit/action@v3.0.1
+        name: Pre Commit check
+      - name: Run tests
+        run: |
+          poetry run pytest -v
