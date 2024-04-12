@@ -1,4 +1,5 @@
-name: push ci on: [push]
+name: push ci
+on: [push]
 jobs:
   pyright:
     name: pyright check
