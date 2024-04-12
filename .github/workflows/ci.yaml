@@ -2,19 +2,42 @@ name: CI
 on: [push]
 jobs:
   pyright:
-    name: pyright lint
-    runs-on: ubuntu-latest
+    name: CI
+    needs: pre-commit-check
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.11]
+    runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - id: cache-dependencies
+        name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.venv
+          key: ${{ matrix.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: ${{ matrix.os }}-
+      - name: Install dependencies
+        if: steps.cache-dependencies.cache-hit != 'true'
+        run: |
+          python -m pip install -U pip poetry
+          poetry --version
+          poetry check --no-interaction
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction
+      - name: Run tests
+        run: |
+          poetry run pytest -v
       - uses: jakebailey/pyright-action@v2
         with:
           project: pyproject.toml
-  ruff:
-    name: ruff lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+          venv-path: .venv
       - uses: chartboost/ruff-action@v1
         with:
           src: src
-   
