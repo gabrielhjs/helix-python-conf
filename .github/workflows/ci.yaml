@@ -1,7 +1,14 @@
 name: CI
 on: [push]
 jobs:
-  pyright:
+  pre-commit-check:
+    name: Pre-Commit Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@4
+      - uses: actions/setup-python@5
+      - uses: pre-commit/action@3
+  ci:
     name: CI
     needs: pre-commit-check
     strategy:
