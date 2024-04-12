@@ -18,21 +18,9 @@ jobs:
         with:
           cache: poetry
           python-version: ${{ matrix.python-version }}
-      - name: Setup local environment
+      - name: Install dependencies
         run: |
           poetry check --no-interaction
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.create true --local
-      - id: cache-dependencies
-        name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/.venv
-          key: ${{ matrix.os }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: ${{ matrix.os }}-
-      - name: Install dependencies
-        if: steps.cache-dependencies.cache-hit != 'true'
-        run: |
           poetry install --no-interaction
       - run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
       - name: Pre Commit check
