@@ -1,5 +1,4 @@
-name: push ci
-on: [push]
+name: push ci on: [push]
 jobs:
   pyright:
     name: pyright check
@@ -8,7 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: jakebailey/pyright-action@v2
         with:
-          working-directory: helix-python-conf
+          working-directory: helix_python_conf
           project: pyproject.toml
   ruff:
     name: ruff check
@@ -17,6 +16,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: chartboost/ruff-action@v1
         with:
-          src: helix-python-conf
+          src: helix_python_conf
           args: 'format --check'
     
