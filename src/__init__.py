@@ -1,4 +1,10 @@
+import pymongo
+
+
 test = "str"
+
+
+print(pymongo.version)
 
 
 def test1(param: str) -> str:
