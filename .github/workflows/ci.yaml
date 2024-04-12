@@ -11,14 +11,15 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+      - name: Install Poetry
+        run: pipx install poetry
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
+          cache: poetry
           python-version: ${{ matrix.python-version }}
       - name: Setup local environment
         run: |
-          python -m pip install -U pip poetry
-          poetry --version
           poetry check --no-interaction
           poetry config virtualenvs.in-project true
           poetry config virtualenvs.create true --local
@@ -33,6 +34,7 @@ jobs:
         if: steps.cache-dependencies.cache-hit != 'true'
         run: |
           poetry install --no-interaction
+      - run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
       - name: Pre Commit check
         run: |
           poetry run pre-commit run --all-files
